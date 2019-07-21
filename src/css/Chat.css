@@ -1,0 +1,50 @@
+
+.Chat{
+    padding: 10px;
+    border: 2px solid gray;
+    width: 30%;
+    border-radius: 15px;
+    border-color: royalblue;
+}
+
+.MessageDisplay{
+    display: block;
+    width: 90%;
+    height: 350px;
+    overflow-y: auto;
+    word-wrap: break-word;
+}
+
+#messageHandle{
+    font-weight: 700;
+    color: salmon;
+}
+
+
+
+h1{
+    color: royalblue;
+}
+
+input{
+    width: 80%;
+    border-radius: 15px;
+    border-style: solid;
+    border-width: 1px;
+    padding: 7px;
+    border-color: lightblue;
+
+}
+
+button{
+    border-radius: 15px;
+    border-style: solid;
+    border-width: 0px;
+    padding: 7px;
+    margin: 5px;
+    background-color: skyblue;
+    
+}
+
+
+

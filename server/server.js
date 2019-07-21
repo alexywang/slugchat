@@ -1,6 +1,8 @@
+const Lobby = require('./lobbies.js');
 const express = require('express');
 const socket = require('socket.io');
 const path = require('path');
+
 
 // Server setup
 const app = express();
@@ -10,6 +12,7 @@ const server = app.listen(4000, () => {
 
 // socket.io setup
 const io = socket(server);
+
 io.on('connection', socket => {
     console.log('New connection from ' + socket.id);
 
@@ -29,6 +32,11 @@ io.on('connection', socket => {
         socket.broadcast.emit('typing', typer);
     });
 });
+
+const lobby = new Lobby(io);
+const lobbySocket = lobby.startLobby();
+
+
 
 // Serve static files 
 app.use(express.static(path.join(__dirname, '../build')));

@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import socketIOClient from 'socket.io-client';
+import '../css/Chat.css';
 import { arrayExpression } from '@babel/types';
 
 class Chat extends Component{
@@ -10,7 +11,7 @@ class Chat extends Component{
             typers: [], 
             myHandle: "",
             myMessage: "",
-            endpoint: "http://localhost:4000"
+            endpoint: "http://localhost:4000",
         }
 
         this.onMessageReceived = this.onMessageReceived.bind(this);
@@ -37,7 +38,6 @@ class Chat extends Component{
 
     // Add the new typer handle to the typer list if they aren't there already. 
     onTypingReceived(typerHandle){
-        console.log('New typer: ' + typerHandle);
         //Append the new typer to the list 
         const oldTypers = this.state.typers;
         const newTypers = oldTypers.indexOf(typerHandle) === -1 ? [...oldTypers, typerHandle] : oldTypers;
@@ -46,27 +46,29 @@ class Chat extends Component{
 
     // Update the state of my handle.
     onHandleBoxChange(event){
-        console.log('Handle changing...');
         this.setState({myHandle: event.target.value});
     }
 
     // Register self as a typer with the server
     onMessageBoxChange(event){
-        console.log('Message changing...');
         const {myHandle} = this.state;
         this.socket.emit('typing', myHandle) // Typing event to be emitted to the other users
         this.setState({myMessage: event.target.value});
     }
 
-    // 
+    // Submit a message to the server. 
     onMessageBoxSubmit(event){
-        console.log('Sending message.');
         const{myHandle, myMessage} = this.state;
-        this.socket.emit('message', {
-            text: myMessage,
-            handle: myHandle
-        });
-        this.setState({myMessage: ""});
+
+        if(myMessage.length !== 0 && myHandle.length !== 0)
+        {
+            this.socket.emit('message', {
+                text: myMessage,
+                handle: myHandle
+            });
+            this.setState({myMessage: ""});
+        }
+        
         event.preventDefault();
     }
 
@@ -77,12 +79,10 @@ class Chat extends Component{
         // Connect and define listeners
         this.socket = socketIOClient(endpoint); 
         this.socket.on('message', (message) => { // Receiving a message
-            console.log(message);
             this.onMessageReceived(message);
         });
         
         this.socket.on('typing', (typer) => { // Receiving a new typer list
-            console.log('New typer '+ typer);
             this.onTypingReceived(typer);
         });
     }
@@ -91,10 +91,9 @@ class Chat extends Component{
         const {messages, typers, myHandle, myMessage} = this.state;
         return (
             <div className="Chat">
-                <h1>Slugchat</h1>
+                <center><h1>Slugchat</h1></center>
                 <MessageDisplay messages={messages} />
                 <DynamicList list={typers}/>
-                Enter your message: <br/> 
                 <HandleBox value={myHandle} onChange={this.onHandleBoxChange}></HandleBox>
                 <MessageBox value={myMessage} onChange={this.onMessageBoxChange} onSubmit={this.onMessageBoxSubmit}>Send </MessageBox>
             </div>
@@ -127,6 +126,7 @@ class MessageDisplay extends Component{
                 type="text"
                 onChange={onChange}
                 value={value}
+                placeholder="Message"
             />
             <button type = "submit">
                 {children}
@@ -137,7 +137,7 @@ class MessageDisplay extends Component{
 
 const HandleBox = ({value, onChange, children}) => {
     return (
-        <input type="text" className="HandleBox" onChange={onChange} value={value}>{children}</input>
+        <input type="text" className="HandleBox" onChange={onChange} value={value} placeholder="Handle">{children}</input>
     )
 }
 
