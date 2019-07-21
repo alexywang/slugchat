@@ -8,18 +8,23 @@ class Lobby extends Component {
             rooms: [],
             endpoint: 'localhost:4000'
         }
+
+        
     }
 
+    onRoomJoin(room){
+        
+    }
     
     componentDidMount(){
         const {endpoint} = this.state;
         
         // Connect
-        this.socket = socketIOClient(endpoint + '/lobby');
+        this.lobbySocket = socketIOClient(endpoint + '/lobby');
+        this.chatSocket = socketIOClient(endpoint + '/chats');
         
         // Listen
-
-        this.socket.on('roomList', roomList => { // Reflect rooms stored on server.
+        this.lobbySocket.on('roomList', roomList => { // Reflect rooms stored on server.
             console.log('Receiving room list...');
             this.setState({rooms: roomList});
         });

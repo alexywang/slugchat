@@ -52,17 +52,23 @@ class Chat extends Component{
     // Register self as a typer with the server
     onMessageBoxChange(event){
         const {myHandle} = this.state;
-        this.socket.emit('typing', myHandle) // Typing event to be emitted to the other users
+        const {room} = this.props;
+        this.chatSocket.emit('typing', {
+            roomid: room.id,
+            typer: myHandle
+        }); // Typing event to be emitted to the other users
         this.setState({myMessage: event.target.value});
     }
 
     // Submit a message to the server. 
     onMessageBoxSubmit(event){
         const{myHandle, myMessage} = this.state;
+        const{room} = this.props;
 
         if(myMessage.length !== 0 && myHandle.length !== 0)
         {
-            this.socket.emit('message', {
+            this.chatSocket.emit('message', {
+                roomid: room.id,
                 text: myMessage,
                 handle: myHandle
             });
@@ -75,23 +81,34 @@ class Chat extends Component{
 
     componentDidMount(){
         const {endpoint} = this.state;
+        const {room, user} = this.props;
 
         // Connect and define listeners
-        this.socket = socketIOClient(endpoint); 
-        this.socket.on('message', (message) => { // Receiving a message
+        this.chatSocket = socketIOClient(endpoint+'/chats');
+        this.chatSocket.emit('joinRoom', {
+            roomid: room.id,
+            user: user
+        });
+
+        this.chatSocket.on('joinRoom', ({user}) =>{
+            //TODO: Display notification for other users joining. 
+        })
+
+        this.chatSocket.on('message', (message) => { // Receiving a message
             this.onMessageReceived(message);
         });
         
-        this.socket.on('typing', (typer) => { // Receiving a new typer list
+        this.chatSocket.on('typing', (typer) => { // Receiving a new typer list
             this.onTypingReceived(typer);
         });
     }
 
     render(){
         const {messages, typers, myHandle, myMessage} = this.state;
+        const {room} = this.props;
         return (
             <div className="Chat">
-                <center><h1>Slugchat</h1></center>
+                <center><h1>{room.name}</h1></center>
                 <MessageDisplay messages={messages} />
                 <DynamicList list={typers}/>
                 <HandleBox value={myHandle} onChange={this.onHandleBoxChange}></HandleBox>

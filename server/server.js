@@ -34,7 +34,7 @@ io.on('connection', socket => {
 });
 
 const lobby = new Lobby(io);
-const lobbySocket = lobby.startLobby();
+lobby.startLobby();
 
 
 

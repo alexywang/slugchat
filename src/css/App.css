@@ -1,0 +1,13 @@
+.ChatGrid{
+    display: grid;
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+}
+
+.AllChats{
+    display: grid;
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+    grid-auto-columns: auto;
+    
+}

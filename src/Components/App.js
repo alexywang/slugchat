@@ -10,33 +10,49 @@ class App extends Component{
   constructor(props){
     super(props);
     this.state = {
-      rooms : []
+      joinedRooms : []
     }
 
     this.addRoom = this.addRoom.bind(this);
+    this.removeRoom = this.removeRoom.bind(this);
   }
 
   addRoom(newRoom){
     console.log('Adding a new chat.');
     const isSameRoom = room => room.id === newRoom.id;
     //Check if room already exists
-    const oldRooms = this.state.rooms;
+    const oldRooms = this.state.joinedRooms;
     if(!oldRooms.find(isSameRoom)){
       const newRooms = [...oldRooms, newRoom];
-      this.setState({rooms: newRooms});
+      this.setState({joinedRooms: newRooms});
     }
   }
 
+
+  removeRoom(id){
+
+  }
+
+
+
   renderChat(room){
+    const testUser = {
+      name: 'tester'
+    }
     return (
-      <div id = {room.id}>
-        Here is a chat.
+      <div className="grid-item">
+        <div key = {room.id}>
+          <Chat
+            room={room}
+            user={testUser}
+          ></Chat>
+        </div>
       </div>
     )
   }
 
   renderAllChats(){
-    const {rooms} = this.state;
+    const {joinedRooms: rooms} = this.state;
     return (
       <div className="AllChats">
             {rooms.map(room => this.renderChat(room))}
@@ -46,12 +62,15 @@ class App extends Component{
 
   render() {
     return (
-      <div className="ChatContainer">
-        <Lobby
-          onRoomJoin={this.addRoom}
-        ></Lobby>
+      <div className="ChatGrid">
+        <div className="grid-item">
+          <Lobby
+            onRoomJoin={this.addRoom}
+          ></Lobby>
+        </div>
 
         {this.renderAllChats()}
+      
       </div>
     )
   }

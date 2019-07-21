@@ -1,76 +1,49 @@
 const socket = require('socket.io');
 const path = require('path');
-
-class Room {
-    constructor(id, name, capacity){
-        this.id = id;
-        this.name = name;
-        this.capacity = capacity;
-        this.users = [];
-        this.messages = [];
-    }
-
-    addUser(user){
-        if(this.users.length >= this.capacity){
-            return false;
-        }else{
-            this.users.push(user);
-            return true;
-        }
-    }
-
-}
+const ChatServer = require('./chat.js');
 
 class Lobby {
     constructor(socketServer){
         this.server = socketServer;
-        this.rooms = [];
         this.nextId = 1;
         this.lobbyNamespace = undefined;
-        this.chatNamespace = undefined;
+        this.chatServer = undefined;
     }
 
     startLobby(){
+        this.chatServer = new ChatServer(this.server);
+        this.chatServer.startChatServer()
+        .then(this.createLobbyNamespace());
+     
+        // console.log('Starting chat namespace');
+        // this.chatNamespace = this.server.of('/chat');
+        // this.chatNamespace.on('connection', (socket) => {
+            
+        // })   
+    }
+
+    async createLobbyNamespace(){
         console.log('Starting lobby namespace');
+
         this.lobbyNamespace = this.server.of('/lobby');
         this.lobbyNamespace.on('connection', (socket) => {
             // Define lobby listeners
             console.log(socket.id + ' has connected to the lobby');
 
-            // Send the send the just connected socket the list of rooms 
-            this.lobbyNamespace.to(socket.id).emit('roomList', this.rooms);
+            // Send the send the just connected socket the list of rooms
+            console.log(this.chatServer ? true : false);
+            this.lobbyNamespace.to(socket.id).emit('roomList', this.chatServer.getRooms());
         });
-
-        // this.chatNamespace = this.server.of('/chat');
-        // this.chatNamespace.on('connection', (socket) => {
-
-        // })
-
-
-        this.rooms.push(this.generateDefaultRoom());
         return this.lobbyNamespace;
-    }
 
-    generateRoomId(){
-        let id = this.nextId;
-        this.nextId++;
-        return id; 
-    }
-
-    generateDefaultRoom(){
-        return new Room(this.generateRoomId(), 'default room', 10);
     }
 
     createRoom(name, capacity){
-        let newRoom = new Room(this.generateRoomId(), capacity);
-        this.rooms.push(newRoom);
-        return newRoom;
+        this.chatServer.createRoom(name, capacity);
     }
 
     removeRoom(id){
-        const roomDoesntMatchId = (room) => room.id !== id; 
-        // Filter rooms with id matching the parameter
-        this.rooms = this.rooms.fitler(roomDoesntMatchId);
+        this.chatServer.removeRoom(id);
     }
 }
 
