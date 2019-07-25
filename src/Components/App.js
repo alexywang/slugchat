@@ -10,7 +10,10 @@ class App extends Component{
   constructor(props){
     super(props);
     this.state = {
-      joinedRooms : []
+      joinedRooms : [],
+      user: {
+        name:'testUser'
+      }
     }
 
     this.addRoom = this.addRoom.bind(this);
@@ -18,13 +21,21 @@ class App extends Component{
   }
 
   addRoom(newRoom){
-    console.log('Adding a new chat.');
+    const {user} = this.state;
     const isSameRoom = room => room.id === newRoom.id;
     //Check if room already exists
     const oldRooms = this.state.joinedRooms;
     if(!oldRooms.find(isSameRoom)){
-      const newRooms = [...oldRooms, newRoom];
-      this.setState({joinedRooms: newRooms});
+      // Try to join if they have capacity
+      if(newRoom.users.length < newRoom.capacity){
+        console.log('Adding a new chat.');
+        const newRooms = [...oldRooms, newRoom];
+        this.setState({joinedRooms: newRooms});
+      }else{
+        console.log('Room was full.');
+      }
+    }else{
+      console.log('Already joined this room.')
     }
   }
 
@@ -36,15 +47,13 @@ class App extends Component{
 
 
   renderChat(room){
-    const testUser = {
-      name: 'tester'
-    }
+    const {user} = this.state;
     return (
       <div className="grid-item">
         <div key = {room.id}>
           <Chat
             room={room}
-            user={testUser}
+            user={user}
           ></Chat>
         </div>
       </div>

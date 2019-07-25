@@ -1,6 +1,7 @@
 const socket = require('socket.io');
 const path = require('path');
 const ChatServer = require('./chat.js');
+const EventEmitter = require('events');
 
 class Lobby {
     constructor(socketServer){
@@ -13,7 +14,7 @@ class Lobby {
     startLobby(){
         this.chatServer = new ChatServer(this.server);
         this.chatServer.startChatServer()
-        .then(this.createLobbyNamespace());
+        .then((result) => this.createLobbyNamespace(result), (error) => {console.log(error)});
      
         // console.log('Starting chat namespace');
         // this.chatNamespace = this.server.of('/chat');
@@ -22,7 +23,7 @@ class Lobby {
         // })   
     }
 
-    async createLobbyNamespace(){
+    async createLobbyNamespace(lobbyEmitter){
         console.log('Starting lobby namespace');
 
         this.lobbyNamespace = this.server.of('/lobby');
@@ -34,6 +35,10 @@ class Lobby {
             console.log(this.chatServer ? true : false);
             this.lobbyNamespace.to(socket.id).emit('roomList', this.chatServer.getRooms());
         });
+
+        lobbyEmitter.on('serverSideRoomChange', rooms => {
+            this.lobbyNamespace.emit('roomList', rooms);
+        })
         return this.lobbyNamespace;
 
     }

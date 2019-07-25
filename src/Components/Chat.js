@@ -83,6 +83,7 @@ class Chat extends Component{
         const {endpoint} = this.state;
         const {room, user} = this.props;
 
+
         // Connect and define listeners
         this.chatSocket = socketIOClient(endpoint+'/chats');
         this.chatSocket.emit('joinRoom', {
@@ -101,6 +102,8 @@ class Chat extends Component{
         this.chatSocket.on('typing', (typer) => { // Receiving a new typer list
             this.onTypingReceived(typer);
         });
+
+        this.setState({messages: room.messages});
     }
 
     render(){
