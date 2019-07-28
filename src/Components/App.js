@@ -12,7 +12,8 @@ class App extends Component{
     this.state = {
       joinedRooms : [],
       user: {
-        name:'testUser'
+        name:'testUser',
+        id: Math.random()
       }
     }
 
@@ -85,5 +86,6 @@ class App extends Component{
   }
 
 }
+
 
 export default App; 

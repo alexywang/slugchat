@@ -2,6 +2,24 @@ const socket = require('socket.io');
 const path = require('path');
 const EventEmitter = require('events');
 
+
+class SocketMap extends Map{
+    
+    registerSocketJoin(socketid, userid, roomid){
+        if(this.has(socketid)){ //Append to that user's rooms.
+            let storedData = this.get(socketid);
+            storedData.rooms.push(roomid);
+            console.log(storedData);
+            this.set(socketid, storedData);
+        }else{
+            this.set(socketid, {
+                userid: userid,
+                rooms: [roomid]
+            });
+        }
+    }
+}
+
 class Room {
     constructor(id, name, capacity){
         this.id = id;
@@ -9,6 +27,7 @@ class Room {
         this.capacity = capacity;
         this.users = [];
         this.messages = [];
+        this.socketUserMap = []
     }
 
     addUser(user){
@@ -24,8 +43,8 @@ class Room {
         this.messages.push(message);
     }
 
-    removeUser(user){
-        const isNotUser = (item) => item.name !== user.name; 
+    removeUser(userid){
+        const isNotUser = (item) => item.id !== userid; 
         this.users = this.users.filter(isNotUser);
     }
 }
@@ -35,6 +54,7 @@ class ChatServer {
         this.server = socketServer;
         this.rooms = [];
         this.nextId = 1;
+        this.socketMap = new SocketMap();
     }
 
     async startChatServer(){
@@ -61,12 +81,27 @@ class ChatServer {
                 console.log('Adding ' + socket.id + ' to room '+ roomid);
                 socket.join(roomid);
                 this.getRoom(roomid).addUser(user);
-                socket.broadcast.to(roomid).emit('join-room', {
+                socket.broadcast.to(roomid).emit('joinRoom', {
                     user: user
                 });
-                // Keep track of the room this socket is assigned to. FIXME: Why is socket state resetting?
-                socket.roomid = roomid;
-                socket.user = user;
+                //TODO: Implement user->rooms mapping                
+                this.updateClients();
+
+                this.socketMap.registerSocketJoin(socket.id, user.id, roomid);
+
+            });
+
+            // Remove a user from all their rooms when they disconnect
+            socket.on('disconnect', () => {
+                console.log(socket.id + ' is disconnecting.');
+                console.log(this.socketMap.has(socket.id) + ' _______');
+                if(this.socketMap.has(socket.id)){
+                    const {userid, rooms} = this.socketMap.get(socket.id);
+                    rooms.map(roomid => {
+                        this.getRoom(roomid).removeUser(userid);
+                    });
+                    this.socketMap.delete(socket.id);
+                }
                 this.updateClients();
             });
 

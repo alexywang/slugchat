@@ -79,6 +79,7 @@ class Chat extends Component{
     }
 
 
+
     componentDidMount(){
         const {endpoint} = this.state;
         const {room, user} = this.props;
@@ -104,6 +105,17 @@ class Chat extends Component{
         });
 
         this.setState({messages: room.messages});
+
+        // Listen for when the user closes the window to remove them from serverside user lists
+        window.addEventListener('beforeunload', (event) => {
+            console.log('unloading');
+            this.chatSocket.emit('unloading', {
+                room: this.room.id,
+                user: this.user
+            });
+        });
+
+
     }
 
     render(){
