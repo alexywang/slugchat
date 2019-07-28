@@ -56,18 +56,37 @@ const RoomList = ({rooms, onRoomJoin}) => {
 
 const Room = ({room, onRoomJoin, children}) => {
     const {name, capacity, users} = room;
+    const usernameList = users.map(user => user.name);
     return (
         <div className="Room"> 
             <span id="title">{name}</span> 
-            <span id="userlist">{users.map(user => user.name)}</span>
+           
             <span id ="capacity">{`${users.length}/${capacity}`}</span>   
             <button id="join"
                 onClick={onRoomJoin}
             >
             {children}
             </button> 
+            <span id="userlist">
+                <HoverList
+                    list={usernameList}
+                >Users</HoverList>
+            </span>
         </div> 
     )
 }
 
+const HoverList =({list, children}) => {
+    return(
+        <div className="HoverList">
+        <button className="HoverHitbox">{children}</button>
+            <div className="HoverContent">
+                {list.map(item => 
+                    <li>{item}</li>    
+                )}
+            </div>
+
+        </div>
+    )
+}
 export default Lobby;
