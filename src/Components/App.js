@@ -18,7 +18,7 @@ class App extends Component{
     }
 
     this.addRoom = this.addRoom.bind(this);
-    this.removeRoom = this.removeRoom.bind(this);
+    this.leaveRoom = this.leaveRoom.bind(this);
   }
 
   addRoom(newRoom){
@@ -41,8 +41,11 @@ class App extends Component{
   }
 
 
-  removeRoom(id){
-
+  leaveRoom(targetRoom){
+    const isntSameRoom = room => room.id !== targetRoom.id;
+    const oldRooms = this.state.joinedRooms;
+    const newRooms = oldRooms.filter(isntSameRoom);
+    this.setState({joinedRooms: newRooms});
   }
 
 
@@ -50,11 +53,12 @@ class App extends Component{
   renderChat(room){
     const {user} = this.state;
     return (
-      <div className="grid-item">
-        <div key = {room.id}>
+      <div key ={room.id} className="grid-item">
+        <div>
           <Chat
             room={room}
             user={user}
+            onLeaveRoom = {this.leaveRoom}
           ></Chat>
         </div>
       </div>

@@ -19,6 +19,7 @@ class Chat extends Component{
         this.onHandleBoxChange = this.onHandleBoxChange.bind(this);
         this.onMessageBoxChange = this.onMessageBoxChange.bind(this);
         this.onMessageBoxSubmit = this.onMessageBoxSubmit.bind(this);
+        this.leaveAndDisconnect = this.leaveAndDisconnect.bind(this);
     }
 
     // Add new message to list, and remove the message's handle from the typer list.
@@ -77,7 +78,13 @@ class Chat extends Component{
         
         event.preventDefault();
     }
-
+    
+    leaveAndDisconnect(){
+        const {onLeaveRoom, room} = this.props;
+        onLeaveRoom(room);
+        //Disconnect my socket
+        this.chatSocket.disconnect();
+    }
 
 
     componentDidMount(){
@@ -123,6 +130,7 @@ class Chat extends Component{
         const {room} = this.props;
         return (
             <div className="Chat">
+                <Button onClick = {this.leaveAndDisconnect}>X</Button>
                 <center><h1>{room.name}</h1></center>
                 <MessageDisplay messages={messages} />
                 <DynamicList list={typers}/>
@@ -193,6 +201,14 @@ const DynamicList = ({list}) => {
                 {list.length > 0 ? listToString(list) +` ${connector} typing...` : ''}
             </p>
         </div>
+    )
+}
+
+const Button = ({onClick, children}) => {
+    return (
+        <button onClick= {onClick}>
+            {children}
+        </button>
     )
 }
 

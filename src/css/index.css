@@ -44,6 +44,12 @@ h1 {
 .HoverList:hover .HoverContent{
   display: block;
 }
-.HoverList:hover .HoverHitbox{
-  background-color: rgb(0, 110, 255);
+
+.capacity {
+  background-color: green;
+}
+
+span{
+  padding: 5px;
+  margin: 1px;
 }

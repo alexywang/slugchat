@@ -57,11 +57,13 @@ const RoomList = ({rooms, onRoomJoin}) => {
 const Room = ({room, onRoomJoin, children}) => {
     const {name, capacity, users} = room;
     const usernameList = users.map(user => user.name);
+
+    const capacityStyle = users.length >= capacity ? {'backgroundColor': 'red'} : {'backgroundColor': 'green'}
     return (
         <div className="Room"> 
             <span id="title">{name}</span> 
            
-            <span id ="capacity">{`${users.length}/${capacity}`}</span>   
+           
             <button id="join"
                 onClick={onRoomJoin}
             >
@@ -70,19 +72,25 @@ const Room = ({room, onRoomJoin, children}) => {
             <span id="userlist">
                 <HoverList
                     list={usernameList}
-                >Users</HoverList>
+                > 
+                    
+                    <span id ="capacity" style={capacityStyle}>
+                        {`${users.length}/${capacity}`}
+                    </span>   
+                </HoverList>
             </span>
         </div> 
     )
 }
 
 const HoverList =({list, children}) => {
+    let key = 0;
     return(
         <div className="HoverList">
-        <button className="HoverHitbox">{children}</button>
+        <div className="HoverHitbox">{children}</div>
             <div className="HoverContent">
                 {list.map(item => 
-                    <li>{item}</li>    
+                    <li key ={key++}>{item}</li>    
                 )}
             </div>
 
