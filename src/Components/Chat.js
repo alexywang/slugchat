@@ -63,15 +63,15 @@ class Chat extends Component{
 
     // Submit a message to the server. 
     onMessageBoxSubmit(event){
-        const{myHandle, myMessage} = this.state;
-        const{room} = this.props;
+        const{myHandle, myMessage, } = this.state;
+        const{room, user} = this.props;
 
         if(myMessage.length !== 0 && myHandle.length !== 0)
         {
             this.chatSocket.emit('message', {
                 roomid: room.id,
                 text: myMessage,
-                handle: myHandle
+                handle: user.name + '@' + myHandle
             });
             this.setState({myMessage: ""});
         }
@@ -214,3 +214,6 @@ const Button = ({onClick, children}) => {
 
 
 export default Chat;
+export {
+    
+}

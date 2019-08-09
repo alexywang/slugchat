@@ -9,11 +9,31 @@ class Lobby extends Component {
             endpoint: 'localhost:4000'
         }
 
-        
+        this.onCreateRoom = this.onCreateRoom.bind(this);
     }
 
-    onRoomJoin(room){
-        
+    onCreateRoom(event, name, capacity){
+        event.preventDefault();
+
+        if(!name || !capacity){
+            return;
+        }
+        if(capacity > 100 || capacity < 2){
+            window.alert('Capacity must be between 2 and 100');
+        }
+        console.log(name);
+        console.log(capacity);
+        const {onRoomJoin} = this.props;
+        // Tell server to create the room.
+        this.chatSocket.emit('createRoom', {
+            name: name,
+            capacity: capacity
+        });
+
+        this.chatSocket.on('newRoomReady', room => {
+            onRoomJoin(room);
+        });
+
     }
     
     componentDidMount(){
@@ -35,7 +55,14 @@ class Lobby extends Component {
         return(
             <div className="Lobby">
                 <RoomList rooms={this.state.rooms} onRoomJoin={onRoomJoin}/>
+                <CreateRoom
+                    onCreateRoom = {this.onCreateRoom}
+                    
+                >
+                    Create Room
+                </CreateRoom>
             </div>
+        
         )
     }
 }
@@ -60,7 +87,7 @@ const Room = ({room, onRoomJoin, children}) => {
 
     const capacityStyle = users.length >= capacity ? {'backgroundColor': 'red'} : {'backgroundColor': 'green'}
     return (
-        <div className="Room"> 
+        <div className="Room">
             <span id="title">{name}</span> 
            
            
@@ -96,5 +123,43 @@ const HoverList =({list, children}) => {
 
         </div>
     )
+}
+
+class CreateRoom extends Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            name: '',
+            capacity: undefined
+        }
+    }
+
+    render(){
+        const {onCreateRoom, children} = this.props;
+        const {name, capacity} = this.state;
+        return (
+            <div className="CreateRoom">
+                <form onSubmit={event => onCreateRoom(event, name, capacity)}>
+                    <input 
+                        type="text"
+                        onChange = {(event) => {
+                            this.setState({name: event.target.value});
+                        }}
+                        value={name}
+                        placeholder="Chat Room Name"
+                    />
+                    <input
+                        type="number"
+                        onChange = {(event) => {
+                            this.setState({capacity: event.target.value});
+                        }}
+                        value={capacity}
+                        placeholder="Capacity"
+                    />
+                    <button type="submit">{children}</button>
+                </form>
+            </div>
+        )
+    }
 }
 export default Lobby;

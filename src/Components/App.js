@@ -12,13 +12,29 @@ class App extends Component{
     this.state = {
       joinedRooms : [],
       user: {
-        name:'testUser',
-        id: Math.random()
-      }
+        name:'',
+        id: '' + Math.random()
+      },
+      usernameInput: ''
     }
 
     this.addRoom = this.addRoom.bind(this);
     this.leaveRoom = this.leaveRoom.bind(this);
+    this.onUsernameSubmit = this.onUsernameSubmit.bind(this);
+    this.onUsernameChange = this.onUsernameChange.bind(this);
+  }
+
+  onUsernameSubmit(event){
+    event.preventDefault();
+    let newUser = {
+      name: this.state.usernameInput,
+      id: this.state.user.id
+    }
+    this.setState({user: newUser});
+  }
+
+  onUsernameChange(event){
+    this.setState({usernameInput: event.target.value});
   }
 
   addRoom(newRoom){
@@ -35,8 +51,6 @@ class App extends Component{
       }else{
         console.log('Room was full.');
       }
-    }else{
-      console.log('Already joined this room.')
     }
   }
 
@@ -47,7 +61,6 @@ class App extends Component{
     const newRooms = oldRooms.filter(isntSameRoom);
     this.setState({joinedRooms: newRooms});
   }
-
 
 
   renderChat(room){
@@ -75,21 +88,50 @@ class App extends Component{
   }
 
   render() {
-    return (
-      <div className="ChatGrid">
-        <div className="grid-item">
-          <Lobby
-            onRoomJoin={this.addRoom}
-          ></Lobby>
+    const {user} = this.state;
+    if(!user.name){
+      return(
+        <div className="usernamePrompt"> 
+          <TextInput
+            onSubmit={this.onUsernameSubmit}
+            onChange={this.onUsernameChange}
+            placeholder="Choose your display name"
+          >
+            Set Username
+          </TextInput>
         </div>
-
-        {this.renderAllChats()}
-      
-      </div>
-    )
+      )
+    }else{
+      return (
+        <div className="ChatGrid">
+          <div className="grid-item">
+            <Lobby
+              onRoomJoin={this.addRoom}
+            ></Lobby>
+          </div>
+          {this.renderAllChats()}
+        
+        </div>
+      )
+    }
   }
 
 }
 
+
+const TextInput = ({onSubmit, onChange, placeholder, children}) => {
+  return(
+    <form className="TextInput" onSubmit={onSubmit}>
+      <input
+        type="text"
+        placeholder={placeholder}
+        onChange={onChange}
+      />
+      <button type="submit">
+        {children}
+      </button>
+    </form>
+  )
+}
 
 export default App; 

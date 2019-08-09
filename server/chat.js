@@ -85,11 +85,22 @@ class ChatServer {
                     user: user
                 });
                 //TODO: Implement user->rooms mapping                
-                this.updateClients();
+                this.updateRoomsToClients();
 
                 this.socketMap.registerSocketJoin(socket.id, user.id, roomid);
 
             });
+
+            socket.on('createRoom', ({name, capacity}) => {
+                console.log(name);
+                console.log(capacity);
+                const newRoom = this.createRoom(name, capacity);
+                this.updateRoomsToClients();
+
+                // Emit back to the user to add themselves to the room
+                socket.emit('newRoomReady', newRoom);
+            });
+        
 
             // Remove a user from all their rooms when they disconnect
             socket.on('disconnect', () => {
@@ -102,7 +113,7 @@ class ChatServer {
                     });
                     this.socketMap.delete(socket.id);
                 }
-                this.updateClients();
+                this.updateRoomsToClients();
             });
 
             // socket.on('disconnect', () => {
@@ -141,9 +152,9 @@ class ChatServer {
     }
 
     createRoom(name, capacity){
-        let newRoom = new Room(this.generateRoomId(), capacity);
+        let newRoom = new Room(this.generateRoomId(), name, capacity);
         this.rooms.push(newRoom);
-        this.updateClients();
+        this.updateRoomsToClients();
         return newRoom;
     }
 
@@ -151,10 +162,10 @@ class ChatServer {
         const roomDoesntMatchId = (room) => room.id !== id; 
         // Filter rooms with id matching the parameter
         this.rooms = this.rooms.fitler(roomDoesntMatchId);
-        this.updateClients();
+        this.updateRoomsToClients();
     }
 
-    updateClients(){
+    updateRoomsToClients(){
         console.log('updating clients');
         this.lobbyEmitter.emit('serverSideRoomChange', this.rooms);
     }
