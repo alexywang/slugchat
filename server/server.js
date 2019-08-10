@@ -40,4 +40,3 @@ lobby.startLobby();
 // Serve static files 
 app.use(express.static(path.join(__dirname, '../build')));
 
-exports.slugchat = functions.https.onRequest(app);
