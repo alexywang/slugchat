@@ -40,8 +40,8 @@ class Lobby extends Component {
         const {endpoint} = this.state;
         
         // Connect
-        this.lobbySocket = socketIOClient(endpoint + '/lobby');
-        this.chatSocket = socketIOClient(endpoint + '/chats');
+        this.lobbySocket = socketIOClient(endpoint + 'lobby');
+        this.chatSocket = socketIOClient(endpoint + 'chats');
         
         // Listen
         this.lobbySocket.on('roomList', roomList => { // Reflect rooms stored on server.
