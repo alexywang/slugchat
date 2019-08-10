@@ -2,7 +2,6 @@ const Lobby = require('./lobbies.js');
 const express = require('express');
 const socket = require('socket.io');
 const path = require('path');
-const functions = require('firebase-functions');
 
 // Server setup
 const app = express();
