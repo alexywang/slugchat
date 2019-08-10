@@ -6,7 +6,7 @@ class Lobby extends Component {
         super(props);
         this.state = { 
             rooms: [],
-            endpoint: 'localhost:4000'
+            endpoint: '/'
         }
 
         this.onCreateRoom = this.onCreateRoom.bind(this);
