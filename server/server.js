@@ -5,7 +5,7 @@ const path = require('path');
 
 // Server setup
 const app = express();
-const server = app.listen(4000, () => {
+const server = app.listen(process.env.PORT || 5000, () => {
     console.log("Listening on port 4000...");
 });
 
