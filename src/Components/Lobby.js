@@ -20,6 +20,7 @@ class Lobby extends Component {
         }
         if(capacity > 100 || capacity < 2){
             window.alert('Capacity must be between 2 and 100');
+            return;
         }
         console.log(name);
         console.log(capacity);
