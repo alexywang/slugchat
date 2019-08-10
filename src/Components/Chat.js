@@ -11,7 +11,7 @@ class Chat extends Component{
             typers: [], 
             myHandle: "",
             myMessage: "",
-            endpoint: "http://localhost:4000",
+            endpoint: "/",
         }
 
         this.onMessageReceived = this.onMessageReceived.bind(this);
