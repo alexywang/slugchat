@@ -93,7 +93,7 @@ class Chat extends Component{
 
 
         // Connect and define listeners
-        this.chatSocket = socketIOClient(endpoint+'/chats');
+        this.chatSocket = socketIOClient(endpoint+'chats');
         this.chatSocket.emit('joinRoom', {
             roomid: room.id,
             user: user
